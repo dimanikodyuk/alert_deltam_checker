@@ -32,3 +32,4 @@ def check_error(result_data):
 -------------------------------------------------------------------------
 """
         bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+
