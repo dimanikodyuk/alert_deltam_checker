@@ -17,7 +17,7 @@ if __name__ == "__main__":
             time_end = datetime.strptime(res[2], '%H:%M:%S')
 
             # Якщо поточний час > за час початку перевірки а також поточний час < за час закінчення перевірки
-            if res[0] == 1 and current_time > time_start.time() and current_time < time_end.time():
+            if res[0] == 1 and current_time >= time_start.time() and current_time <= time_end.time():
                 check_error(create_loan_checker(j))
 
     except ValueError as err:
