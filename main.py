@@ -5,6 +5,7 @@ from datetime import datetime
 
 if __name__ == "__main__":
     try:
+
         active_conf = get_active_config()
         for j in active_conf:
             print(f"Запуск перевірки з конфігу № {j}")
