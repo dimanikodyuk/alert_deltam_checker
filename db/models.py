@@ -1,5 +1,5 @@
 import pymysql
-from config import host_delta, user_delta, password_delta, database_delta, telegram_bot, nykodiuk_id, pavluchenko_id, goncharuk_id
+from config import host_delta, user_delta, password_delta, database_delta, telegram_bot, nykodiuk_id, pavluchenko_id, goncharuk_id, rovnyi_id
 from logs.logger import logger_deltam_checker
 conn = pymysql.connect(host=host_delta, port=3306, user=user_delta, passwd=password_delta, db=database_delta,
                        autocommit=True, charset="utf8")
@@ -31,4 +31,7 @@ def check_error(result_data):
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
 """
         bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+        bot.send_message(pavluchenko_id, message, parse_mode="HTML")
+        bot.send_message(goncharuk_id, message, parse_mode="HTML")
+        bot.send_message(rovnyi_id, message, parse_mode="HTML")
 
