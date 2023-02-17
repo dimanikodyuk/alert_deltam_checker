@@ -1,13 +1,13 @@
 import pymysql
 import pymssql
 import telebot
-from config import host_delta, user_delta, password_delta, database_delta, telegram_bot, nykodiuk_id, pavluchenko_id\
-    , goncharuk_id, rovnyi_id, host_dlm, user_dlm, passowrd_dlm, database_dlm
+from config import host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm, passowrd_dlm, database_dlm, group_id
 from logs.logger import logger_deltam_checker
 conn = pymysql.connect(host=host_delta, port=3306, user=user_delta, passwd=password_delta, db=database_delta, charset="utf8")
 conn_mssql = pymssql.connect(server=host_dlm, user=user_dlm, password=passowrd_dlm, database=database_dlm, charset='cp1251')
 
 bot = telebot.TeleBot(telegram_bot)
+#bot.send_message(group_id, "Hello FinX", parse_mode="HTML")
 
 
 def get_active_config():
@@ -43,6 +43,14 @@ def create_loan_checker_leads_api(p_type_id):
     return res[0]
 
 
+def update_error_send_status(p_lead_id, p_error_type):
+    upd = conn.cursor()
+    upd_sql = f"""UPDATE crm..finx_error_leads_bot set send_status = 1, dt_mod = getdate() 
+                    where lead_id = {p_lead_id} and error_type = {p_error_type};"""
+    upd.execute(upd_sql)
+    upd.close()
+
+
 # Процедура перевірки наявності помилок в БД crm (92 server)
 def create_loan_checker_crm(p_type_id):
     checker = conn_mssql.cursor()
@@ -65,10 +73,7 @@ def check_error_leads_api(result_data):
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
 """
-        bot.send_message(nykodiuk_id, message, parse_mode="HTML")
-        bot.send_message(pavluchenko_id, message, parse_mode="HTML")
-        bot.send_message(goncharuk_id, message, parse_mode="HTML")
-        bot.send_message(rovnyi_id, message, parse_mode="HTML")
+        bot.send_message(group_id, message, parse_mode="HTML")
 
 
 # Генерація тексту помилки і відправка з 92 серверу
@@ -90,7 +95,15 @@ def check_error_crm(result_data):
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
-        bot.send_message(nykodiuk_id, message, parse_mode="HTML")
-        bot.send_message(pavluchenko_id, message, parse_mode="HTML")
-        bot.send_message(goncharuk_id, message, parse_mode="HTML")
-        bot.send_message(rovnyi_id, message, parse_mode="HTML")
+        bot.send_message(group_id, message, parse_mode="HTML")
+        # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
+        update_error_send_status(error_lead, error_type)
+
+# @bot.message_handler(content_types=['text'])
+# def get_text_message(message):
+#     if message.text == "test":
+#         bot.send_message(message.from_user.id, message.chat.id, parse_mode="HTML")
+
+
+#if __name__ == "__main__":
+#    bot.polling()
