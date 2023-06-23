@@ -4,7 +4,8 @@ import telebot
 from config import host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm, passowrd_dlm, database_dlm, group_id
 from logs.logger import logger_deltam_checker
 conn = pymysql.connect(host=host_delta, port=3306, user=user_delta, passwd=password_delta, db=database_delta, charset="utf8")
-conn_mssql = pymssql.connect(server=host_dlm, user=user_dlm, password=passowrd_dlm, database=database_dlm, charset='cp1251')
+conn_mssql = pymssql.connect(server=host_dlm, user=user_dlm, password=passowrd_dlm, database=database_dlm, charset='cp1251'
+                             , autocommit=True)
 
 bot = telebot.TeleBot(telegram_bot)
 #bot.send_message(group_id, "Hello FinX", parse_mode="HTML")
@@ -43,10 +44,12 @@ def create_loan_checker_leads_api(p_type_id):
     return res[0]
 
 
-def update_error_send_status(p_lead_id, p_error_type):
-    upd = conn.cursor()
-    upd_sql = f"""UPDATE crm..finx_error_leads_bot set send_status = 1, dt_mod = getdate() 
-                    where lead_id = {p_lead_id} and error_type = {p_error_type};"""
+def update_error_send_status(p_lead_id, p_error_id):
+    upd = conn_mssql.cursor()
+    #upd_sql = f"""UPDATE crm..finx_error_leads_bot set send_status = 1, dt_mod = getdate()
+    #                where lead_id = {p_lead_id} and id = {p_error_id};""" # error_type = {p_error_type};"""
+    upd_sql = f"EXEC crm..[alert_deltam_update] {p_lead_id}, {p_error_id}"
+    print(f"upd_sql: {upd_sql}")
     upd.execute(upd_sql)
     upd.close()
 
@@ -55,8 +58,10 @@ def update_error_send_status(p_lead_id, p_error_type):
 def create_loan_checker_crm(p_type_id):
     checker = conn_mssql.cursor()
     checker_sql = f"EXEC crm..[alert_deltam_checker] {p_type_id}"
+    print(f"checker_sql: {checker_sql}")
     checker.execute(checker_sql)
     res = checker.fetchall()
+    print(f"res: {res}")
     checker.close()
     return res
 
@@ -83,9 +88,13 @@ def check_error_crm(result_data):
         error_text = result_data[2]
         error_lead = result_data[3]
         error_contract_num = result_data[4]
+        error_type_report = result_data[5]
+        error_check_type = result_data[6]
+        error_id = result_data[7]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-        message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
+        if error_type_report == 1:
+            message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
@@ -95,9 +104,16 @@ def check_error_crm(result_data):
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
+        elif error_type_report == 2:
+            message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
+
+🟦  <b>Сервіс:</b> <i>{error_type}</i>
+
+🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
+    """
         bot.send_message(group_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
-        update_error_send_status(error_lead, error_type)
+        update_error_send_status(error_lead, error_id)
 
 # @bot.message_handler(content_types=['text'])
 # def get_text_message(message):
