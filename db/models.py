@@ -91,6 +91,7 @@ def check_error_crm(result_data):
         error_type_report = result_data[5]
         error_check_type = result_data[6]
         error_id = result_data[7]
+        error_inn = result_data[8]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 1:
@@ -108,6 +109,8 @@ def check_error_crm(result_data):
             message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
+
+🟨  <b>ІПН:</b> <i>{error_inn}</i>
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
