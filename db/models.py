@@ -61,7 +61,6 @@ def create_loan_checker_crm(p_type_id):
     print(f"checker_sql: {checker_sql}")
     checker.execute(checker_sql)
     res = checker.fetchall()
-    print(f"res: {res}")
     checker.close()
     return res
 
@@ -83,6 +82,7 @@ def check_error_leads_api(result_data):
 
 # Генерація тексту помилки і відправка з 92 серверу
 def check_error_crm(result_data):
+    print(result_data)
     if result_data[0] == 1:
         error_type = result_data[1]
         error_text = result_data[2]
@@ -92,6 +92,7 @@ def check_error_crm(result_data):
         error_check_type = result_data[6]
         error_id = result_data[7]
         error_inn = result_data[8]
+        error_dt = result_data[9]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 1:
@@ -114,6 +115,19 @@ def check_error_crm(result_data):
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
+
+        elif error_type_report == 3:
+            message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
+
+🟦  <b>Сервіс:</b> <i>{error_type}</i>
+
+🟪  <b>Дата і час помилки:</b> <i>{error_dt}</i>
+
+🟨  <b>Лід:</b> <i>{error_lead}</i>
+
+🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
+    """
+
         bot.send_message(group_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
         update_error_send_status(error_lead, error_id)
