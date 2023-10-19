@@ -71,7 +71,7 @@ def check_error_leads_api(result_data):
         error_text = result_data[2]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-        message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
+        message = f"""❗❗❗<b>Помилка</b>❗❗❗
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
@@ -96,7 +96,7 @@ def check_error_crm(result_data):
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 1:
-            message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
+            message = f"""❗❗❗<b>Помилка</b>❗❗❗
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
@@ -107,7 +107,7 @@ def check_error_crm(result_data):
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
         elif error_type_report == 2:
-            message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
+            message = f"""❗❗❗<b>Помилка</b>❗❗❗
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
@@ -117,7 +117,7 @@ def check_error_crm(result_data):
     """
 
         elif error_type_report == 3:
-            message = f"""❗❗❗<b>Виявлено помилку</b>❗❗❗
+            message = f"""❗❗❗<b>Помилка</b>❗❗❗
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
