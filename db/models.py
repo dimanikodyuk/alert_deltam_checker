@@ -127,6 +127,17 @@ def check_error_crm(result_data):
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
+        elif error_type_report == 4:
+            message = f"""❗❗❗<b> УБКІ </b>❗❗❗
+            
+🟦  <b>Сервіс:</b> <i>{error_type}</i>
+
+🟪  <b>К-ть кредитів:</b> <i>{error_lead}</i>
+
+🟨  <b>К-ть надісланих:</b> <i>{error_inn}</i>
+
+🟥  <b>К-ть з критичною помилкою:</b> <i>{error_contract_num}</i> 
+    """
 
         bot.send_message(group_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
