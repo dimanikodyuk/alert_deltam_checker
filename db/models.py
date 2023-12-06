@@ -21,11 +21,9 @@ arr_message = [
 
     ["""❗❗❗<b>Помилка</b>❗❗❗
 
-🟦  <b>Сервіс:</b> <i>{error_type}</i>
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
 
 🟪  <b>Дата і час помилки:</b> <i>{error_dt}</i>
-
-🗃  <b>Тип запису:</b> <i>{repeat_type}</i>
 
 ✏  <b>LEAD_ID:</b> <i>{error_lead}</i>
 
@@ -97,7 +95,7 @@ def check_repeat_type(p_repeat_type):
     if p_repeat_type == 0:
         res = '⚠'
     else:
-        res = '🔁'
+        res = '♻'
 
     return res
 
@@ -158,12 +156,13 @@ def check_error_crm(result_data):
         error_dt = result_data[9]
         error_repeat = result_data[10]
         repeat_type = check_repeat_type(error_repeat)
+        repeat_id = result_data[11]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 1:
             message = arr_message[1][0].format(error_type=error_type,error_lead=error_lead, error_dt=error_dt,
                                                error_contract_num=error_contract_num,error_text=error_text,
-                                               repeat_type=repeat_type)
+                                               repeat_type=repeat_type, repeat_id=repeat_id)
 
         elif error_type_report == 2:
             message = arr_message[2][0].format(error_type=error_type, error_inn=error_inn, error_text=error_text)
