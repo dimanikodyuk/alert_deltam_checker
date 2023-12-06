@@ -24,7 +24,7 @@ arr_message = [
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
-  <b>Тип запису:</b> <i>{repeat_type}</i>
+🗃  <b>Тип запису:</b> <i>{repeat_type}</i>
 
 ✏  <b>LEAD_ID:</b> <i>{error_lead}</i>
 
