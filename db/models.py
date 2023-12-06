@@ -95,7 +95,7 @@ def get_checker_time(p_type_id):
 def check_repeat_type(p_repeat_type):
     res = ''
     if p_repeat_type == 0:
-        res = '🆕'
+        res = '⚠'
     else:
         res = '🔁'
 
@@ -128,6 +128,9 @@ def create_loan_checker_crm(p_type_id):
     res = checker.fetchall()
     checker.close()
     return res
+
+
+
 
 # Генерація тексту помилки і відправка з 91 серверу
 def check_error_leads_api(result_data):
@@ -177,6 +180,7 @@ def check_error_crm(result_data):
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
         update_error_send_status(error_lead, error_id)
 
+# bot.send_sticker(nykodiuk_id, 'CAACAgIAAxkBAAEK6QdlcHvOrfQRI-XsU2xHhBhSoQ1UnQACIQAD_wzODBFb9FtzRu_LMwQ')
 # @bot.message_handler(content_types=['text'])
 # def get_text_message(message):
 #     if message.text == "test":
