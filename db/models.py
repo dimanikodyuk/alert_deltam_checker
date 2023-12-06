@@ -1,7 +1,6 @@
 import pymysql
 import pymssql
 import telebot
-import matplotlib.pyplot as plt
 from config import host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm, passowrd_dlm, database_dlm, group_id, nykodiuk_id
 from logs.logger import logger_deltam_checker
 conn = pymysql.connect(host=host_delta, port=3306, user=user_delta, passwd=password_delta, db=database_delta, charset="utf8")
@@ -77,37 +76,6 @@ def get_active_config():
         id_conf.append(i)
     return id_conf
 
-def get_month_error_count():
-    x = []
-    y = []
-    getter = conn_mssql.cursor()
-    getter_sql = """SELECT 
-	CAST(dt_ins AS DATE) as dt
-,	COUNT(1) AS cou_error
-FROM crm..finx_error_leads_bot 
-WHERE CAST(dt_ins AS DATE) >= DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)
-GROUP BY CAST(dt_ins AS DATE)
-;
-"""
-    getter.execute(getter_sql)
-    res = getter.fetchall()
-    #print(res)
-    for i in res:
-        x.append(i[0])
-        y.append(i[1])
-    #print(x)
-    #print(y)
-
-    plt.plot(x, y, 'r')
-    plt.title('Графік помилок', fontsize=10)
-    plt.xlabel('Дата', fontsize=10)
-    plt.ylabel('К-ть помилок', fontsize=10)
-    plt.grid(True)
-    plt.savefig('graf.png')
-#    plt.legend(loc='best', fontsize=8)
-    plt.show()
-
-#get_month_error_count()
 
 def get_checker_time(p_type_id):
     checker = conn_mssql.cursor()
