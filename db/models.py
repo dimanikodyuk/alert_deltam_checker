@@ -23,6 +23,8 @@ arr_message = [
 
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
+🟪  <b>Дата і час помилки:</b> <i>{error_dt}</i>
+
 🗃  <b>Тип запису:</b> <i>{repeat_type}</i>
 
 ✏  <b>LEAD_ID:</b> <i>{error_lead}</i>
@@ -156,7 +158,7 @@ def check_error_crm(result_data):
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 1:
-            message = arr_message[1][0].format(error_type=error_type,error_lead=error_lead,
+            message = arr_message[1][0].format(error_type=error_type,error_lead=error_lead, error_dt=error_dt,
                                                error_contract_num=error_contract_num,error_text=error_text,
                                                repeat_type=repeat_type)
 
