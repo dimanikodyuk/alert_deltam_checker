@@ -15,13 +15,13 @@ bot = telebot.TeleBot(telegram_bot)
 
 
 # -- ШАБЛОНИ ПОВІДОМЛЕНЬ
-template1 = """❗❗❗<b>Помилка</b>❗❗❗
+template0 = """❗❗❗<b>Помилка</b>❗❗❗
  
 🟦  <b>Сервіс:</b> <i>{error_type}</i>
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i>"""
 
-template2 = """❗❗❗<b>Помилка</b>❗❗❗
+template1 = """❗❗❗<b>Помилка</b>❗❗❗
 
 {repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
 
@@ -34,7 +34,7 @@ template2 = """❗❗❗<b>Помилка</b>❗❗❗
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
 
-template3 = """❗❗❗<b>Помилка</b>❗❗❗
+template2 = """❗❗❗<b>Помилка</b>❗❗❗
 
 {repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
 
@@ -45,7 +45,7 @@ template3 = """❗❗❗<b>Помилка</b>❗❗❗
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
 
-template4 = """❗❗❗<b>Помилка</b>❗❗❗
+template3 = """❗❗❗<b>Помилка</b>❗❗❗
 
 {repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
 
@@ -56,7 +56,7 @@ template4 = """❗❗❗<b>Помилка</b>❗❗❗
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
 
-template5 = """❗❗❗<b> УБКІ </b>❗❗❗
+template4 = """❗❗❗<b> УБКІ </b>❗❗❗
             
 {repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
 
@@ -138,7 +138,7 @@ def check_error_leads_api(result_data):
         error_text = result_data[2]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-        message = template1.format(error_type=error_type, error_text=error_text)
+        message = template0.format(error_type=error_type, error_text=error_text)
         bot.send_message(group_id, message, parse_mode="HTML")
 
 
@@ -160,21 +160,21 @@ def check_error_crm(result_data):
         repeat_id = result_data[11]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-        if error_type_report == 2:
-            message = template2.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
+        if error_type_report == 1:
+            message = template1.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
                                        error_contract_num=error_contract_num, error_text=error_text,
                                        repeat_type=repeat_type, repeat_id=repeat_id)
 
-        elif error_type_report == 3:
-            message = template3.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
+        elif error_type_report == 2:
+            message = template2.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
                                        repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt)
 
-        elif error_type_report == 4:
-            message = template4.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
+        elif error_type_report == 3:
+            message = template3.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
                                        error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
 
         elif error_type_report == 4:
-            message = template5.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
+            message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
                                        error_contract_num=error_contract_num, repeat_type=repeat_type,
                                        repeat_id=repeat_id)
 
