@@ -2,7 +2,7 @@ import pymysql
 import pymssql
 import telebot
 from config import (host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm,
-                    passowrd_dlm, database_dlm, group_id, nykodiuk_id)
+                    passowrd_dlm, database_dlm, group_id, nykodiuk_id, rovnyi_id)
 from logs.logger import logger_deltam_checker
 
 conn = pymysql.connect(host=host_delta, port=3306, user=user_delta, passwd=password_delta, db=database_delta,
@@ -65,6 +65,19 @@ template4 = """❗❗❗<b> УБКІ </b>❗❗❗
 🟨  <b>К-ть надісланих:</b> <i>{error_inn}</i>
 
 🟥  <b>К-ть з критичною помилкою:</b> <i>{error_contract_num}</i>"""
+
+template5 = """❗❗❗<b>Помилка</b>❗❗❗
+
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
+
+🟪  <b>Дата і час помилки:</b> <i>{error_dt}</i>
+
+🟩  <b>Дата зміни:</b> <i>{error_data}</i>
+
+🟨  <b>ІПН:</b> <i>{error_inn}</i>
+
+🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
+    """
 
 
 def get_active_config():
@@ -158,6 +171,7 @@ def check_error_crm(result_data):
         error_repeat = result_data[10]
         repeat_type = check_repeat_type(error_repeat)
         repeat_id = result_data[11]
+        error_data = result_data[12]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 1:
@@ -177,6 +191,11 @@ def check_error_crm(result_data):
             message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
                                        error_contract_num=error_contract_num, repeat_type=repeat_type,
                                        repeat_id=repeat_id)
+
+        elif error_type_report == 5:
+            message = template5.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
+                                       repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt, error_data=error_data)
+            bot.send_message(rovnyi_id, message, parse_mode="HTML")
 
         bot.send_message(group_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
