@@ -17,7 +17,7 @@ bot = telebot.TeleBot(telegram_bot)
 # -- ШАБЛОНИ ПОВІДОМЛЕНЬ
 template0 = """❗❗❗<b>Помилка</b>❗❗❗
  
-🟦  <b>Сервіс:</b> <i>{error_type}</i>
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
 
 🟥 <b>Текст помилки:</b> <i>{error_text}</i>"""
 
@@ -174,6 +174,10 @@ def check_error_crm(result_data):
         error_data = result_data[12]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
+        if error_type_report == 0:
+            message = template0.format(error_type=error_type, error_text=error_text, repeat_type=repeat_type,
+                                       repeat_id=repeat_id)
+
         if error_type_report == 1:
             message = template1.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
                                        error_contract_num=error_contract_num, error_text=error_text,
@@ -197,7 +201,7 @@ def check_error_crm(result_data):
                                        repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt, error_data=error_data)
             bot.send_message(rovnyi_id, message, parse_mode="HTML")
 
-        bot.send_message(group_id, message, parse_mode="HTML")
+        bot.send_message(nykodiuk_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
         update_error_send_status(error_lead, error_id)
 
