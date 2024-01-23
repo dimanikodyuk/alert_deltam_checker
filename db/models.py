@@ -201,7 +201,7 @@ def check_error_crm(result_data):
                                        repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt, error_data=error_data)
             bot.send_message(rovnyi_id, message, parse_mode="HTML")
 
-        bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+        bot.send_message(group_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
         update_error_send_status(error_lead, error_id)
 
