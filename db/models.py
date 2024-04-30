@@ -144,7 +144,7 @@ def update_error_send_status(p_lead_id, p_error_id):
 def create_loan_checker_crm(p_type_id):
     checker = conn_mssql.cursor()
     checker_sql = f"EXEC crm..alert_deltam_checker {p_type_id}"
-    print(f"checker_sql: {checker_sql}")
+    #print(f"checker_sql: {checker_sql}")
     checker.execute(checker_sql)
     res = checker.fetchall()
     checker.close()
@@ -152,18 +152,21 @@ def create_loan_checker_crm(p_type_id):
 
 
 # Генерація тексту помилки і відправка з 91 серверу
-def check_error_leads_api(result_data):
+def check_error_leads_api(result_data, p_silent_send):
     if result_data[0] == 1:
         error_type = result_data[1]
         error_text = result_data[2]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         message = template0.format(error_type=error_type, error_text=error_text)
-        bot.send_message(group_id, message, parse_mode="HTML")
 
+        if p_silent_send == 1:
+            bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
+        else:
+            bot.send_message(group_id, message, parse_mode="HTML")
 
 # Генерація тексту помилки і відправка з 92 серверу
-def check_error_crm(result_data):
+def check_error_crm(result_data, p_silent_send):
     print(result_data)
 
     if result_data[0] == 1:
@@ -215,7 +218,10 @@ def check_error_crm(result_data):
                                        error_step=par1, error_value=par2, error_check_value=par3,
                                        error_yest_value=par4, error_today_value=par5)
 
-        bot.send_message(group_id, message, parse_mode="HTML")
+        if p_silent_send == 1:
+            bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
+        else:
+            bot.send_message(group_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
         update_error_send_status(error_lead, error_id)
 

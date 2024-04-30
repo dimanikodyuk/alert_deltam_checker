@@ -20,16 +20,19 @@ if __name__ == "__main__":
             # Час зупинки перевірки
             time_end = datetime.strptime(res[1], '%H:%M:%S')
 
-            # Якщо статус конфігу = 1, а також поточний час > за час початку перевірки а також поточний час < за час закінчення перевірки
+            #Якщо статус конфігу = 1, а також поточний час > за час початку перевірки а також поточний час < за час закінчення перевірки
             if current_time >= time_start.time() and current_time <= time_end.time():
-                # Якщо БД leads_api
+                # Якщо БД leads_api (91)
+                # Зміна для розуміння, чи це має бути тиха відправка, чи ні
+                silent_send = 1 if current_time.hour > 22 and current_time.hour < 7 else 0
+
                 if int(j[1]) == 1:
-                    check_error_leads_api(create_loan_checker_leads_api(j[0]))
-                # Якщо БД crm
+                    check_error_leads_api(create_loan_checker_leads_api(j[0]), silent_send)
+                # Якщо БД crm (92)
                 elif int(j[1]) == 2:
                     result = create_loan_checker_crm(j[0])
                     for i in result:
-                        check_error_crm(i)
+                        check_error_crm(i, silent_send)
         print("--------------------------------------------------------")
 
     except ValueError as err:
