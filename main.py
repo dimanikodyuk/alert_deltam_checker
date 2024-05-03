@@ -24,8 +24,7 @@ if __name__ == "__main__":
             if current_time >= time_start.time() and current_time <= time_end.time():
                 # Якщо БД leads_api (91)
                 # Зміна для розуміння, чи це має бути тиха відправка, чи ні
-                silent_send = 1 if current_time.hour > 22 and current_time.hour < 7 else 0
-
+                silent_send = 1 if current_time.hour > 22 or current_time.hour < 7 else 0
                 if int(j[1]) == 1:
                     check_error_leads_api(create_loan_checker_leads_api(j[0]), silent_send)
                 # Якщо БД crm (92)
