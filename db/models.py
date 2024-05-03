@@ -104,6 +104,8 @@ def get_checker_time(p_type_id):
     checker_sql = f"""SELECT 
             CAST(LEFT(start_dt_check,8) AS VARCHAR(100)) as dt_start
         ,	CAST(LEFT(end_dt_check  ,8) AS VARCHAR(100)) as dt_end
+        ,   hour_start_silent_send
+        ,   hour_end_silent_send
         FROM crm..alert_deltam_config
         WHERE id = {p_type_id};"""
     checker.execute(checker_sql)
@@ -218,6 +220,7 @@ def check_error_crm(result_data, p_silent_send):
                                        error_step=par1, error_value=par2, error_check_value=par3,
                                        error_yest_value=par4, error_today_value=par5)
 
+        print(f"SILENT_MODE: {p_silent_send}")
         if p_silent_send == 1:
             bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
         else:
