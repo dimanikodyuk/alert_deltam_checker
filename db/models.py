@@ -136,9 +136,13 @@ def create_loan_checker_leads_api(p_type_id):
         return res[0]
 
     except ValueError as err:
-        logger_deltam_checker.error("Помилка даних models.py: " + str(err))
+        logger_deltam_checker.error("Помилка даних models.py - create_loan_checker_leads_api: " + str(err))
     except Exception as err:
         logger_deltam_checker.error("Помилка: " + str(err))
+    except pymysql.Error as err:
+        logger_deltam_checker.error("Помилка pymysql.Error: " + str(err))
+    except pymysql.MySQLError as err:
+        logger_deltam_checker.error("Помилка pymysql.MySQLError: " + str(err))
 
 
 def update_error_send_status(p_lead_id, p_error_id):
@@ -150,13 +154,22 @@ def update_error_send_status(p_lead_id, p_error_id):
 
 # Процедура перевірки наявності помилок в БД crm (92 server)
 def create_loan_checker_crm(p_type_id):
-    checker = conn_mssql.cursor()
-    checker_sql = f"EXEC crm..alert_deltam_checker {p_type_id}"
-    #print(f"checker_sql: {checker_sql}")
-    checker.execute(checker_sql)
-    res = checker.fetchall()
-    checker.close()
-    return res
+    try:
+        checker = conn_mssql.cursor()
+        checker_sql = f"EXEC crm..alert_deltam_checker {p_type_id}"
+        #print(f"checker_sql: {checker_sql}")
+        checker.execute(checker_sql)
+        res = checker.fetchall()
+        checker.close()
+        return res
+    except ValueError as err:
+        logger_deltam_checker.error("Помилка даних models.py - create_loan_checker_crm: " + str(err))
+    except Exception as err:
+        logger_deltam_checker.error("Помилка: " + str(err))
+    except pymssql.Error as err:
+        logger_deltam_checker.error("Помилка pymssql.Error: " + str(err))
+    except pymssql.DatabaseError as err:
+        logger_deltam_checker.error("Помилка pymssql.DatabaseError: " + str(err))
 
 
 # Генерація тексту помилки і відправка з 91 серверу
