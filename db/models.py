@@ -127,12 +127,18 @@ def check_repeat_type(p_repeat_type):
 
 # Процедура перевірки наявності помилок в БД leads_api (91 server)
 def create_loan_checker_leads_api(p_type_id):
-    check = conn.cursor()
-    check_sql = f"CALL leads_api.alert_deltam_checker({p_type_id});"
-    check.execute(check_sql)
-    res = check.fetchall()
-    check.close()
-    return res[0]
+    try:
+        check = conn.cursor()
+        check_sql = f"CALL leads_api.alert_deltam_checker({p_type_id});"
+        check.execute(check_sql)
+        res = check.fetchall()
+        check.close()
+        return res[0]
+
+    except ValueError as err:
+        logger_deltam_checker.error("Помилка даних models.py: " + str(err))
+    except Exception as err:
+        logger_deltam_checker.error("Помилка: " + str(err))
 
 
 def update_error_send_status(p_lead_id, p_error_id):
