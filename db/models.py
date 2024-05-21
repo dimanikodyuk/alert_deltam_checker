@@ -163,7 +163,7 @@ def create_loan_checker_crm(p_type_id):
         checker.close()
         return res
     except ValueError as err:
-        logger_deltam_checker.error("Помилка даних models.py - create_loan_checker_crm: " + str(err))
+        logger_deltam_checker.error("Помилка даних models.py- create_loan_checker_crm: " + str(err))
     except Exception as err:
         logger_deltam_checker.error("Помилка create_loan_checker_crm: " + str(err))
     except pymssql.Error as err:
