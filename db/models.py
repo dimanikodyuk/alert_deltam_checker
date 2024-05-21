@@ -138,7 +138,7 @@ def create_loan_checker_leads_api(p_type_id):
     except ValueError as err:
         logger_deltam_checker.error("Помилка даних models.py - create_loan_checker_leads_api: " + str(err))
     except Exception as err:
-        logger_deltam_checker.error("Помилка: " + str(err))
+        logger_deltam_checker.error("Помилка create_loan_checker_leads_api: " + str(err))
     except pymysql.Error as err:
         logger_deltam_checker.error("Помилка pymysql.Error: " + str(err))
     except pymysql.MySQLError as err:
@@ -165,7 +165,7 @@ def create_loan_checker_crm(p_type_id):
     except ValueError as err:
         logger_deltam_checker.error("Помилка даних models.py - create_loan_checker_crm: " + str(err))
     except Exception as err:
-        logger_deltam_checker.error("Помилка: " + str(err))
+        logger_deltam_checker.error("Помилка create_loan_checker_crm: " + str(err))
     except pymssql.Error as err:
         logger_deltam_checker.error("Помилка pymssql.Error: " + str(err))
     except pymssql.DatabaseError as err:
@@ -179,7 +179,7 @@ def check_error_leads_api(result_data, p_silent_send):
         error_text = result_data[2]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-        message = template0.format(error_type=error_type, error_text=error_text)
+        message = template0.format(error_type=error_type, error_text=error_text, repeat_id=1, repeat_type='⚠')
 
         if p_silent_send == 1:
             bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
