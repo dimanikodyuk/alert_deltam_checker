@@ -2,7 +2,7 @@ import pymysql
 import pymssql
 import telebot
 from config import (host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm,
-                    passowrd_dlm, database_dlm, group_id, nykodiuk_id, rovnyi_id)
+                    passowrd_dlm, database_dlm, group_id, nykodiuk_id, rovnyi_id, petrenko_id, harchenko_id)
 from logs.logger import logger_deltam_checker
 
 conn = pymysql.connect(host=host_delta, port=3306, user=user_delta, passwd=password_delta, db=database_delta,
@@ -223,6 +223,9 @@ def check_error_crm(result_data, p_silent_send):
         elif error_type_report == 3:
             message = template3.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
                                        error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+            bot.send_message(rovnyi_id, message, parse_mode="HTML")
+            bot.send_message(petrenko_id, message, parse_mode="HTML")
+            bot.send_message(harchenko_id, message, parse_mode="HTML")
 
         elif error_type_report == 4:
             message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
@@ -233,6 +236,8 @@ def check_error_crm(result_data, p_silent_send):
             message = template5.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
                                        repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt, error_data=error_data)
             bot.send_message(rovnyi_id, message, parse_mode="HTML")
+            bot.send_message(petrenko_id, message, parse_mode="HTML")
+            bot.send_message(harchenko_id, message, parse_mode="HTML")
 
         elif error_type_report == 6:
             message = template6.format(repeat_type=repeat_type, error_type=error_type, repeat_id=repeat_id,
