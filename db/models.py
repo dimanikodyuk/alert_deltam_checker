@@ -86,6 +86,18 @@ template6 = """❗❗❗<b>Помилка</b>❗❗❗
 
 🟥 <b>Текст помилки:</b> <i>Крок {error_step}. Відхилення <b>{error_value}</b>%. Граничний показник <b>{error_check_value}</b>%. Показник на вчора <b>{error_yest_value}</b>%, сьогодні <b>{error_today_value}</b>%</i>"""
 
+# Окремий костиль для Ровного, Петренка та Харченка
+
+template7 = """❗❗❗<b>Помилка</b>❗❗❗
+
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
+
+🟪  <b>Дата і час помилки:</b> <i>{error_dt}</i>
+
+🟨  <b>Лід:</b> <i>{error_lead}</i>
+
+🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
+    """
 
 def get_active_config():
     id_conf = []
@@ -223,9 +235,6 @@ def check_error_crm(result_data, p_silent_send):
         elif error_type_report == 3:
             message = template3.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
                                        error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-            bot.send_message(rovnyi_id, message, parse_mode="HTML")
-            bot.send_message(petrenko_id, message, parse_mode="HTML")
-            bot.send_message(harchenko_id, message, parse_mode="HTML")
 
         elif error_type_report == 4:
             message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
@@ -243,6 +252,14 @@ def check_error_crm(result_data, p_silent_send):
             message = template6.format(repeat_type=repeat_type, error_type=error_type, repeat_id=repeat_id,
                                        error_step=par1, error_value=par2, error_check_value=par3,
                                        error_yest_value=par4, error_today_value=par5)
+
+        elif error_type_report == 7:
+            message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
+                                       error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+            bot.send_message(rovnyi_id, message, parse_mode="HTML")
+            bot.send_message(petrenko_id, message, parse_mode="HTML")
+            bot.send_message(harchenko_id, message, parse_mode="HTML")
+
 
         print(f"SILENT_MODE: {p_silent_send}")
         if p_silent_send == 1:
