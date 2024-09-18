@@ -223,6 +223,10 @@ def check_error_crm(result_data, p_silent_send):
         par5 = result_data[17]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
+        if error_type_report == 0:
+            message = template0.format(error_type=error_type, error_text=error_text,
+                                       repeat_type=repeat_type, repeat_id=repeat_id)
+
         if error_type_report == 1:
             message = template1.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
                                        error_contract_num=error_contract_num, error_text=error_text,
@@ -259,7 +263,6 @@ def check_error_crm(result_data, p_silent_send):
             bot.send_message(rovnyi_id, message, parse_mode="HTML")
             bot.send_message(petrenko_id, message, parse_mode="HTML")
             bot.send_message(harchenko_id, message, parse_mode="HTML")
-
 
         print(f"SILENT_MODE: {p_silent_send}")
         if p_silent_send == 1:
