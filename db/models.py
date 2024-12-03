@@ -178,7 +178,7 @@ def create_loan_checker_crm(p_type_id):
     try:
         checker = conn_mssql.cursor()
         checker_sql = f"EXEC crm..alert_deltam_checker {p_type_id}"
-        #print(f"checker_sql: {checker_sql}")
+        print(f"checker_sql: {checker_sql}")
         checker.execute(checker_sql)
         res = checker.fetchall()
         checker.close()
@@ -186,7 +186,7 @@ def create_loan_checker_crm(p_type_id):
     except ValueError as err:
         logger_deltam_checker.error("Помилка даних models.py- create_loan_checker_crm: " + str(err))
     except Exception as err:
-        logger_deltam_checker.error("Помилка create_ldoan_checker_crm: " + str(err))
+        logger_deltam_checker.error("Помилка create_loan_checker_crm: " + str(err))
     except pymssql.Error as err:
         logger_deltam_checker.error("Помилка pymssql.Error: " + str(err))
     except pymssql.DatabaseError as err:
@@ -274,10 +274,11 @@ def check_error_crm(result_data, p_silent_send):
             bot.send_message(harchenko_id, message, parse_mode="HTML")
 
         elif error_type_report == 8:
-            message = template7.format(error_type=error_type, error_lead=error_lead,
+            message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
                                        error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
             bot.send_message(rovnyi_id, message, parse_mode="HTML")
             bot.send_message(petrenko_id, message, parse_mode="HTML")
+            bot.send_message(nykodiuk_id, message, parse_mode="HTML")
             #bot.send_message(harchenko_id, message, parse_mode="HTML")
 
         print(f"SILENT_MODE: {p_silent_send}")
