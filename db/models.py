@@ -99,6 +99,15 @@ template7 = """❗❗❗<b>Помилка</b>❗❗❗
 🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
     """
 
+template8 = """❗❗❗<b>Помилка</b>❗❗❗
+
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
+
+🟨  <b>Лід:</b> <i>{error_lead}</i>
+
+🟥 <b>Текст помилки:</b> <i>{error_text}</i> 
+    """
+
 def get_active_config():
     id_conf = []
     conf = conn_mssql.cursor()
@@ -177,7 +186,7 @@ def create_loan_checker_crm(p_type_id):
     except ValueError as err:
         logger_deltam_checker.error("Помилка даних models.py- create_loan_checker_crm: " + str(err))
     except Exception as err:
-        logger_deltam_checker.error("Помилка create_loan_checker_crm: " + str(err))
+        logger_deltam_checker.error("Помилка create_ldoan_checker_crm: " + str(err))
     except pymssql.Error as err:
         logger_deltam_checker.error("Помилка pymssql.Error: " + str(err))
     except pymssql.DatabaseError as err:
@@ -263,6 +272,13 @@ def check_error_crm(result_data, p_silent_send):
             bot.send_message(rovnyi_id, message, parse_mode="HTML")
             bot.send_message(petrenko_id, message, parse_mode="HTML")
             bot.send_message(harchenko_id, message, parse_mode="HTML")
+
+        elif error_type_report == 8:
+            message = template7.format(error_type=error_type, error_lead=error_lead,
+                                       error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+            bot.send_message(rovnyi_id, message, parse_mode="HTML")
+            bot.send_message(petrenko_id, message, parse_mode="HTML")
+            #bot.send_message(harchenko_id, message, parse_mode="HTML")
 
         print(f"SILENT_MODE: {p_silent_send}")
         if p_silent_send == 1:
