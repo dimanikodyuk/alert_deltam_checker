@@ -110,6 +110,18 @@ template8 = """❗❗❗<b>Помилка</b>❗❗❗
 🟥 <b>Тип:</b> <i>{error_text}</i> 
     """
 
+# Шаблон під помилки в таблиці DeltaTellBox..WorkItems по полю KeyId
+template9 = """❗❗❗<b>Помилка</b>❗❗❗
+
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
+
+🟨 <b>DialFlowId:</b> <i>{dial_flow_id}</i>
+
+🟪 <b>WorkItemId:</b> <i>{work_item_id}</i>
+
+🟥 <b>Тип:</b> <i>{error_text}</i> 
+    """
+
 def get_active_config():
     id_conf = []
     conf = conn_mssql.cursor()
@@ -233,6 +245,9 @@ def check_error_crm(result_data, p_silent_send):
         par4 = result_data[16]
         par5 = result_data[17]
         client_id = result_data[18]
+        dial_flow_id = result_data[19]
+        work_item_id = result_data[20]
+
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 0:
@@ -283,6 +298,10 @@ def check_error_crm(result_data, p_silent_send):
             bot.send_message(petrenko_id, message, parse_mode="HTML")
             bot.send_message(nykodiuk_id, message, parse_mode="HTML")
             #bot.send_message(harchenko_id, message, parse_mode="HTML")
+
+        elif error_type_report == 9:
+            message = template9.format(error_type=error_type, error_dt=error_dt, dial_flow_id=dial_flow_id, work_item_id=work_item_id,
+                                       error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
 
         print(f"SILENT_MODE: {p_silent_send}")
         if p_silent_send == 1:
