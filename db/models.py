@@ -321,9 +321,9 @@ def check_error_crm(result_data, p_silent_send):
 
         print(f"SILENT_MODE: {p_silent_send}")
         if p_silent_send == 1:
-            bot.send_message(nykodiuk_id, message, parse_mode="HTML", disable_notification=True)
+            bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
         else:
-            bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+            bot.send_message(group_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
         update_error_send_status(error_lead, error_id)
 
