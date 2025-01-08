@@ -11,15 +11,26 @@ conn_mssql = pymssql.connect(server=host_dlm, user=user_dlm, password=passowrd_d
                              charset='cp1251', autocommit=True)
 
 bot = telebot.TeleBot(telegram_bot)
-# bot.send_message(group_id, "Hello FinX", parse_mode="HTML")
-
 
 # -- ШАБЛОНИ ПОВІДОМЛЕНЬ
 template0 = """❗❗❗<b>Помилка</b>❗❗❗
- 
+
 {repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
 
-🟥 <b>Текст помилки:</b> <i>{error_text}</i>"""
+🟥 <b>Текст помилки:</b> <i>{error_text}</i>
+
+"""
+
+# Аналог шаблону 0, але додатково показує процедуру для перевірки помилки чи щось інше
+template10 = """❗❗❗<b>Помилка</b>❗❗❗
+
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
+
+🟥 <b>Текст помилки:</b> <i>{error_text}</i>
+
+<blockquote>Процедура перевірки: <code>{test_procedure}</code></blockquote>
+
+"""
 
 template1 = """❗❗❗<b>Помилка</b>❗❗❗
 
@@ -121,6 +132,7 @@ template9 = """❗❗❗<b>Помилка</b>❗❗❗
 
 🟥 <b>Тип:</b> <i>{error_text}</i> 
     """
+
 
 def get_active_config():
     id_conf = []
@@ -247,12 +259,16 @@ def check_error_crm(result_data, p_silent_send):
         client_id = result_data[18]
         dial_flow_id = result_data[19]
         work_item_id = result_data[20]
-
+        test_procedure = result_data[21]
         logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
         if error_type_report == 0:
-            message = template0.format(error_type=error_type, error_text=error_text,
-                                       repeat_type=repeat_type, repeat_id=repeat_id)
+            if test_procedure is None:
+                message = template0.format(error_type=error_type, error_text=error_text,
+                                           repeat_type=repeat_type, repeat_id=repeat_id)
+            else:
+                message = template10.format(error_type=error_type, error_text=error_text,
+                                           repeat_type=repeat_type, repeat_id=repeat_id, test_procedure=test_procedure)
 
         if error_type_report == 1:
             message = template1.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
@@ -296,7 +312,7 @@ def check_error_crm(result_data, p_silent_send):
                                        error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
             bot.send_message(rovnyi_id, message, parse_mode="HTML")
             bot.send_message(petrenko_id, message, parse_mode="HTML")
-            bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+            #bot.send_message(nykodiuk_id, message, parse_mode="HTML")
             #bot.send_message(harchenko_id, message, parse_mode="HTML")
 
         elif error_type_report == 9:
@@ -305,9 +321,9 @@ def check_error_crm(result_data, p_silent_send):
 
         print(f"SILENT_MODE: {p_silent_send}")
         if p_silent_send == 1:
-            bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
+            bot.send_message(nykodiuk_id, message, parse_mode="HTML", disable_notification=True)
         else:
-            bot.send_message(group_id, message, parse_mode="HTML")
+            bot.send_message(nykodiuk_id, message, parse_mode="HTML")
         # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
         update_error_send_status(error_lead, error_id)
 
