@@ -9,6 +9,7 @@ conn = pymysql.connect(host=host_delta, port=3306, user=user_delta, passwd=passw
                        charset="utf8")
 conn_mssql = pymssql.connect(server=host_dlm, user=user_dlm, password=passowrd_dlm, database=database_dlm,
                              charset='cp1251', autocommit=True)
+import requests
 
 bot = telebot.TeleBot(telegram_bot)
 
@@ -184,12 +185,21 @@ def create_loan_checker_leads_api(p_type_id):
 
     except ValueError as err:
         logger_deltam_checker.error("Помилка даних models.py - create_loan_checker_leads_api: " + str(err))
+        send_global_error(err)
     except Exception as err:
         logger_deltam_checker.error("Помилка create_loan_checker_leads_api: " + str(err))
+        send_global_error(err)
     except pymysql.Error as err:
         logger_deltam_checker.error("Помилка pymysql.Error: " + str(err))
+        send_global_error(err)
     except pymysql.MySQLError as err:
         logger_deltam_checker.error("Помилка pymysql.MySQLError: " + str(err))
+        send_global_error(err)
+
+
+def send_global_error(p_error_text):
+    url = f"https://api.telegram.org/bot{telegram_bot}/sendMessage?chat_id={nykodiuk_id}&text={p_error_text}"
+    requests.get(url)
 
 
 def update_error_send_status(p_lead_id, p_error_id):
@@ -211,12 +221,16 @@ def create_loan_checker_crm(p_type_id):
         return res
     except ValueError as err:
         logger_deltam_checker.error("Помилка даних models.py- create_loan_checker_crm: " + str(err))
+        send_global_error(err)
     except Exception as err:
         logger_deltam_checker.error("Помилка create_loan_checker_crm: " + str(err))
+        send_global_error(err)
     except pymssql.Error as err:
         logger_deltam_checker.error("Помилка pymssql.Error: " + str(err))
+        send_global_error(err)
     except pymssql.DatabaseError as err:
         logger_deltam_checker.error("Помилка pymssql.DatabaseError: " + str(err))
+        send_global_error(err)
 
 
 # Генерація тексту помилки і відправка з 91 серверу
@@ -236,96 +250,107 @@ def check_error_leads_api(result_data, p_silent_send):
 # Генерація тексту помилки і відправка з 92 серверу
 def check_error_crm(result_data, p_silent_send):
     print(result_data)
+    try:
+        if result_data[0] == 1:
+            error_type = result_data[1]
+            error_text = result_data[2]
+            error_lead = result_data[3]
+            error_contract_num = result_data[4]
+            error_type_report = result_data[5]
+            #error_check_type = result_data[6]
+            error_id = result_data[7]
+            error_inn = result_data[8]
+            error_dt = result_data[9]
+            error_repeat = result_data[10]
+            repeat_type = check_repeat_type(error_repeat)
+            repeat_id = result_data[11]
+            error_data = result_data[12]
+            par1 = result_data[13]
+            par2 = result_data[14]
+            par3 = result_data[15]
+            par4 = result_data[16]
+            par5 = result_data[17]
+            client_id = result_data[18]
+            dial_flow_id = result_data[19]
+            work_item_id = result_data[20]
+            test_procedure = result_data[21]
+            logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-    if result_data[0] == 1:
-        error_type = result_data[1]
-        error_text = result_data[2]
-        error_lead = result_data[3]
-        error_contract_num = result_data[4]
-        error_type_report = result_data[5]
-        #error_check_type = result_data[6]
-        error_id = result_data[7]
-        error_inn = result_data[8]
-        error_dt = result_data[9]
-        error_repeat = result_data[10]
-        repeat_type = check_repeat_type(error_repeat)
-        repeat_id = result_data[11]
-        error_data = result_data[12]
-        par1 = result_data[13]
-        par2 = result_data[14]
-        par3 = result_data[15]
-        par4 = result_data[16]
-        par5 = result_data[17]
-        client_id = result_data[18]
-        dial_flow_id = result_data[19]
-        work_item_id = result_data[20]
-        test_procedure = result_data[21]
-        logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
+            if error_type_report == 0:
+                if test_procedure is None:
+                    message = template0.format(error_type=error_type, error_text=error_text,
+                                               repeat_type=repeat_type, repeat_id=repeat_id)
+                else:
+                    message = template10.format(error_type=error_type, error_text=error_text,
+                                               repeat_type=repeat_type, repeat_id=repeat_id, test_procedure=test_procedure)
 
-        if error_type_report == 0:
-            if test_procedure is None:
-                message = template0.format(error_type=error_type, error_text=error_text,
+            if error_type_report == 1:
+                message = template1.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
+                                           error_contract_num=error_contract_num, error_text=error_text,
                                            repeat_type=repeat_type, repeat_id=repeat_id)
+
+            elif error_type_report == 2:
+                message = template2.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
+                                           repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt)
+
+            elif error_type_report == 3:
+                message = template3.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
+                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+
+            elif error_type_report == 4:
+                message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
+                                           error_contract_num=error_contract_num, repeat_type=repeat_type,
+                                           repeat_id=repeat_id)
+
+            elif error_type_report == 5:
+                message = template5.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
+                                           repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt, error_data=error_data)
+                bot.send_message(rovnyi_id, message, parse_mode="HTML")
+                bot.send_message(petrenko_id, message, parse_mode="HTML")
+                bot.send_message(harchenko_id, message, parse_mode="HTML")
+
+            elif error_type_report == 6:
+                message = template6.format(repeat_type=repeat_type, error_type=error_type, repeat_id=repeat_id,
+                                           error_step=par1, error_value=par2, error_check_value=par3,
+                                           error_yest_value=par4, error_today_value=par5)
+
+            elif error_type_report == 7:
+                message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
+                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+                bot.send_message(rovnyi_id, message, parse_mode="HTML")
+                bot.send_message(petrenko_id, message, parse_mode="HTML")
+                bot.send_message(harchenko_id, message, parse_mode="HTML")
+
+            elif error_type_report == 8:
+                message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead, client_id=client_id,
+                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+                bot.send_message(rovnyi_id, message, parse_mode="HTML")
+                bot.send_message(petrenko_id, message, parse_mode="HTML")
+                #bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+                #bot.send_message(harchenko_id, message, parse_mode="HTML")
+
+            elif error_type_report == 9:
+                message = template9.format(error_type=error_type, error_dt=error_dt, dial_flow_id=dial_flow_id, work_item_id=work_item_id,
+                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+
+            print(f"SILENT_MODE: {p_silent_send}")
+            if p_silent_send == 1:
+                bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
             else:
-                message = template10.format(error_type=error_type, error_text=error_text,
-                                           repeat_type=repeat_type, repeat_id=repeat_id, test_procedure=test_procedure)
+                bot.send_message(group_id, message, parse_mode="HTML")
+            # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
+            update_error_send_status(error_lead, error_id)
 
-        if error_type_report == 1:
-            message = template1.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
-                                       error_contract_num=error_contract_num, error_text=error_text,
-                                       repeat_type=repeat_type, repeat_id=repeat_id)
+    except ValueError as err:
+        logger_deltam_checker.error("Помилка даних models.py-check_error_crm: " + str(err))
+        send_global_error(err)
+    except Exception as err:
+        logger_deltam_checker.error("Помилка models.py-check_error_crm: " + str(err))
+        send_global_error(err)
+    except EnvironmentError as err:
+        logger_deltam_checker.error("Помилка Environmental models.py-check_error_crm: " + str(err))
+        send_global_error(err)
 
-        elif error_type_report == 2:
-            message = template2.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
-                                       repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt)
-
-        elif error_type_report == 3:
-            message = template3.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
-                                       error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-
-        elif error_type_report == 4:
-            message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
-                                       error_contract_num=error_contract_num, repeat_type=repeat_type,
-                                       repeat_id=repeat_id)
-
-        elif error_type_report == 5:
-            message = template5.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
-                                       repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt, error_data=error_data)
-            bot.send_message(rovnyi_id, message, parse_mode="HTML")
-            bot.send_message(petrenko_id, message, parse_mode="HTML")
-            bot.send_message(harchenko_id, message, parse_mode="HTML")
-
-        elif error_type_report == 6:
-            message = template6.format(repeat_type=repeat_type, error_type=error_type, repeat_id=repeat_id,
-                                       error_step=par1, error_value=par2, error_check_value=par3,
-                                       error_yest_value=par4, error_today_value=par5)
-
-        elif error_type_report == 7:
-            message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
-                                       error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-            bot.send_message(rovnyi_id, message, parse_mode="HTML")
-            bot.send_message(petrenko_id, message, parse_mode="HTML")
-            bot.send_message(harchenko_id, message, parse_mode="HTML")
-
-        elif error_type_report == 8:
-            message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead, client_id=client_id,
-                                       error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-            bot.send_message(rovnyi_id, message, parse_mode="HTML")
-            bot.send_message(petrenko_id, message, parse_mode="HTML")
-            #bot.send_message(nykodiuk_id, message, parse_mode="HTML")
-            #bot.send_message(harchenko_id, message, parse_mode="HTML")
-
-        elif error_type_report == 9:
-            message = template9.format(error_type=error_type, error_dt=error_dt, dial_flow_id=dial_flow_id, work_item_id=work_item_id,
-                                       error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-
-        print(f"SILENT_MODE: {p_silent_send}")
-        if p_silent_send == 1:
-            bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
-        else:
-            bot.send_message(group_id, message, parse_mode="HTML")
-        # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
-        update_error_send_status(error_lead, error_id)
 
 # bot.send_sticker(nykodiuk_id, 'CAACAgIAAxkBAAEK6QdlcHvOrfQRI-XsU2xHhBhSoQ1UnQACIQAD_wzODBFb9FtzRu_LMwQ')
 # @bot.message_handler(content_types=['text'])

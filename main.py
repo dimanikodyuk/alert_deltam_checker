@@ -1,8 +1,9 @@
 from logs.logger import logger_deltam_checker
 from db.models import get_active_config, get_checker_time, create_loan_checker_leads_api, check_error_leads_api, \
-    create_loan_checker_crm, check_error_crm
+    create_loan_checker_crm, check_error_crm, send_global_error
 from datetime import datetime
-
+from config import telegram_bot, nykodiuk_id
+import requests
 
 if __name__ == "__main__":
     try:
@@ -38,7 +39,13 @@ if __name__ == "__main__":
                         check_error_crm(i, silent_send)
         print("--------------------------------------------------------")
 
+
     except ValueError as err:
         logger_deltam_checker.error("Помилка даних main.py: " + str(err))
+        send_global_error(err)
     except Exception as err:
         logger_deltam_checker.error("Помилка: " + str(err))
+        send_global_error(err)
+    except EnvironmentError as err:
+        logger_deltam_checker.error("Помилка Environment main.py: " + str(err))
+        send_global_error(err)
