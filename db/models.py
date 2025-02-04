@@ -290,9 +290,6 @@ def check_error_crm(result_data, p_silent_send):
             test_procedure = result_data[21]
             logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-            print(f"ERROR_TYPE_REPORT: {error_type_report}")
-            print(f"TEST_PROCEDURE: {test_procedure}")
-
             if error_type_report == 0:
                 if test_procedure is None:
                     message = template0.format(error_type=error_type, error_text=error_text,
