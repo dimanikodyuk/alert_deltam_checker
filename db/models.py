@@ -1,6 +1,7 @@
 import pymysql
 import pymssql
 import telebot
+import os
 from config import (host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm,
                     passowrd_dlm, database_dlm, group_id, nykodiuk_id, rovnyi_id, petrenko_id, harchenko_id)
 from logs.logger import logger_deltam_checker
@@ -12,6 +13,7 @@ conn_mssql = pymssql.connect(server=host_dlm, user=user_dlm, password=passowrd_d
 import requests
 
 bot = telebot.TeleBot(telegram_bot)
+#ubki_img = open('db/ubki.png', 'rb')
 
 # -- ШАБЛОНИ ПОВІДОМЛЕНЬ
 template0 = """❗❗❗<b>Помилка</b>❗❗❗
@@ -32,6 +34,18 @@ template10 = """❗❗❗<b>Помилка</b>❗❗❗
 <blockquote>Процедура перевірки: <code>{test_procedure}</code></blockquote>
 
 """
+
+template11 = """❗❗❗<b>Помилка</b>❗❗❗
+
+{repeat_type}  <b>Сервіс:</b> <i>{error_type} ({repeat_id})</i>
+
+🟨 <b>Помилка:</b> <i>{par1}</i>
+
+🟪 <b>Опис:</b> <i>{par2}</i>
+
+🟥 <b>К-ть:</b> <i>{par3}</i> 
+    """
+
 
 template1 = """❗❗❗<b>Помилка</b>❗❗❗
 
@@ -276,6 +290,9 @@ def check_error_crm(result_data, p_silent_send):
             test_procedure = result_data[21]
             logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
+            print(f"ERROR_TYPE_REPORT: {error_type_report}")
+            print(f"TEST_PROCEDURE: {test_procedure}")
+
             if error_type_report == 0:
                 if test_procedure is None:
                     message = template0.format(error_type=error_type, error_text=error_text,
@@ -301,6 +318,10 @@ def check_error_crm(result_data, p_silent_send):
                 message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
                                            error_contract_num=error_contract_num, repeat_type=repeat_type,
                                            repeat_id=repeat_id)
+                #bot.send_photo(nykodiuk_id, ubki_img, caption=message, parse_mode="HTML")
+                #ubki_img.close()
+                #with open(ubki_img, "rb") as photo:
+                #    bot.send_photo(nykodiuk_id, photo, caption=message, parse_mode="HTML")
 
             elif error_type_report == 5:
                 message = template5.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
@@ -332,6 +353,11 @@ def check_error_crm(result_data, p_silent_send):
             elif error_type_report == 9:
                 message = template9.format(error_type=error_type, error_dt=error_dt, dial_flow_id=dial_flow_id, work_item_id=work_item_id,
                                            error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
+
+            elif error_type_report == 11:
+                message = template11.format(error_type=error_type, repeat_type=repeat_type, repeat_id=repeat_id,
+                                            par1=par1, par2=par2, par3=par3)
+
 
             print(f"SILENT_MODE: {p_silent_send}")
             if p_silent_send == 1:
