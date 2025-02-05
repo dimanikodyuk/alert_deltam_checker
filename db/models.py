@@ -266,101 +266,48 @@ def check_error_crm(result_data, p_silent_send):
     print(result_data)
     try:
         if result_data[0] == 1:
-            error_type = result_data[1]
-            error_text = result_data[2]
-            error_lead = result_data[3]
-            error_contract_num = result_data[4]
-            error_type_report = result_data[5]
-            #error_check_type = result_data[6]
-            error_id = result_data[7]
-            error_inn = result_data[8]
-            error_dt = result_data[9]
-            error_repeat = result_data[10]
+            (
+                error_type, error_text, error_lead, error_contract_num, error_type_report, _,
+                error_id, error_inn, error_dt, error_repeat, repeat_id, error_data,
+                par1, par2, par3, par4, par5, client_id, dial_flow_id, work_item_id,
+                test_procedure, img
+            ) = result_data[1:23]
+
             repeat_type = check_repeat_type(error_repeat)
-            repeat_id = result_data[11]
-            error_data = result_data[12]
-            par1 = result_data[13]
-            par2 = result_data[14]
-            par3 = result_data[15]
-            par4 = result_data[16]
-            par5 = result_data[17]
-            client_id = result_data[18]
-            dial_flow_id = result_data[19]
-            work_item_id = result_data[20]
-            test_procedure = result_data[21]
-            logger_deltam_checker.info(f"Виявлено помилку: {error_text}")
 
-            if error_type_report == 0:
-                if test_procedure is None:
-                    message = template0.format(error_type=error_type, error_text=error_text,
-                                               repeat_type=repeat_type, repeat_id=repeat_id)
-                else:
-                    message = template10.format(error_type=error_type, error_text=error_text,
-                                               repeat_type=repeat_type, repeat_id=repeat_id, test_procedure=test_procedure)
+            # Всі шаблони зберігаємо в словнику
+            templates = {
+                0: template0 if test_procedure is None else template10,
+                1: template1,
+                2: template2,
+                3: template3,
+                4: template4,
+                5: template5,
+                6: template6,
+                7: template7,
+                8: template7,
+                9: template9,
+                11: template11,
+            }
 
-            if error_type_report == 1:
-                message = template1.format(error_type=error_type, error_lead=error_lead, error_dt=error_dt,
-                                           error_contract_num=error_contract_num, error_text=error_text,
-                                           repeat_type=repeat_type, repeat_id=repeat_id)
+            image_folder = "images"
+            image_filename = img
+            image_path = os.path.join(image_folder, image_filename)
 
-            elif error_type_report == 2:
-                message = template2.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
-                                           repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt)
+            # Отримуємо шаблон за ключем
+            message_template = templates.get(error_type_report, "❌ Невідомий тип помилки")
+            message = message_template.format(**locals())  # Використовуємо тільки доступні змінні
 
-            elif error_type_report == 3:
-                message = template3.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
-                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-
-            elif error_type_report == 4:
-                message = template4.format(error_type=error_type, error_lead=error_lead, error_inn=error_inn,
-                                           error_contract_num=error_contract_num, repeat_type=repeat_type,
-                                           repeat_id=repeat_id)
-                #bot.send_photo(nykodiuk_id, ubki_img, caption=message, parse_mode="HTML")
-                #ubki_img.close()
-                #with open(ubki_img, "rb") as photo:
-                #    bot.send_photo(nykodiuk_id, photo, caption=message, parse_mode="HTML")
-
-            elif error_type_report == 5:
-                message = template5.format(error_type=error_type, error_inn=error_inn, error_text=error_text,
-                                           repeat_type=repeat_type, repeat_id=repeat_id, error_dt=error_dt, error_data=error_data)
-                bot.send_message(rovnyi_id, message, parse_mode="HTML")
-                bot.send_message(petrenko_id, message, parse_mode="HTML")
-                bot.send_message(harchenko_id, message, parse_mode="HTML")
-
-            elif error_type_report == 6:
-                message = template6.format(repeat_type=repeat_type, error_type=error_type, repeat_id=repeat_id,
-                                           error_step=par1, error_value=par2, error_check_value=par3,
-                                           error_yest_value=par4, error_today_value=par5)
-
-            elif error_type_report == 7:
-                message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead,
-                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-                bot.send_message(rovnyi_id, message, parse_mode="HTML")
-                bot.send_message(petrenko_id, message, parse_mode="HTML")
-                bot.send_message(harchenko_id, message, parse_mode="HTML")
-
-            elif error_type_report == 8:
-                message = template7.format(error_type=error_type, error_dt=error_dt, error_lead=error_lead, client_id=client_id,
-                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-                bot.send_message(rovnyi_id, message, parse_mode="HTML")
-                bot.send_message(petrenko_id, message, parse_mode="HTML")
-                #bot.send_message(nykodiuk_id, message, parse_mode="HTML")
-                #bot.send_message(harchenko_id, message, parse_mode="HTML")
-
-            elif error_type_report == 9:
-                message = template9.format(error_type=error_type, error_dt=error_dt, dial_flow_id=dial_flow_id, work_item_id=work_item_id,
-                                           error_text=error_text, repeat_type=repeat_type, repeat_id=repeat_id)
-
-            elif error_type_report == 11:
-                message = template11.format(error_type=error_type, repeat_type=repeat_type, repeat_id=repeat_id,
-                                            par1=par1, par2=par2, par3=par3)
-
-
-            print(f"SILENT_MODE: {p_silent_send}")
-            if p_silent_send == 1:
-                bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
+            # Відправка фото, якщо файл існує
+            if os.path.isfile(image_path):
+                with open(image_path, "rb") as photo:
+                    bot.send_photo(group_id, photo, caption=message, parse_mode="HTML",
+                                   disable_notification=bool(p_silent_send))
             else:
-                bot.send_message(group_id, message, parse_mode="HTML")
+                print(f"❌ Файл {image_path} не знайдено! Відправляємо лише текст.")
+                bot.send_message(group_id, message, parse_mode="HTML",
+                                 disable_notification=bool(p_silent_send))
+
             # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
             update_error_send_status(error_lead, error_id)
 
