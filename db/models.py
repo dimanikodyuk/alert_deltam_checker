@@ -298,6 +298,10 @@ def check_error_crm(result_data, p_silent_send):
             message_template = templates.get(error_type_report, "❌ Невідомий тип помилки")
             message = message_template.format(**locals())  # Використовуємо тільки доступні змінні
 
+            if error_type_report == 5 or error_type_report == 7 or error_type_report == 8:
+                bot.send_message(rovnyi_id, message, parse_mode="HTML")
+                bot.send_message(petrenko_id, message, parse_mode="HTML")
+
             # Відправка фото, якщо файл існує
             if os.path.isfile(image_path):
                 with open(image_path, "rb") as photo:
