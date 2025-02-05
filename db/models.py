@@ -291,7 +291,7 @@ def check_error_crm(result_data, p_silent_send):
             }
 
             image_folder = "images"
-            image_filename = img
+            image_filename = img if img is not None else ""
             image_path = os.path.join(image_folder, image_filename)
 
             # Отримуємо шаблон за ключем
