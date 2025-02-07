@@ -223,51 +223,6 @@ def update_error_send_status(p_lead_id, p_error_id):
     upd.close()
 
 
-def test_send_image():
-    checker = conn_mssql.cursor()
-    checker_sql = f"""	SELECT 
-			1										as error_status
-		,	l.error_type							as error_type
-		,	l.error_text							as error_text
-		,	l.lead_id								as error_lead
-		,	l.contract_num							as error_contract_num
-		,   l.type_report							as error_type_report
-		,	l.check_type							as error_check_type
-		,	l.id									as error_id
-		,	l.inn									as error_inn
-		,   FORMAT(l.dt_ins, 'yyyy-MM-dd HH:mm')	as dt
-		,	iif(isnull(l.repeat_num,1) = 1, 0, 1)	as is_repeat	
-		,	isnull(l.repeat_num, 1)					as id_repeat
-		,	FORMAT(l.dt_error, 'yyyy-MM-dd HH:mm')	as error_data
-		,	par1
-		,	par2
-		,	par3
-		,	par4
-		,	par5
-		,	l.cid
-		,	l.DialFlow_Id
-		,	l.WorkItem_Id
-		,	c.test_procedure
-		,	c.img
-		FROM crm..finx_error_leads_bot	l
-		JOIN crm..alert_deltam_config	c ON l.check_type = c.id
-		WHERE CAST(l.dt_ins AS DATE) = CAST(GETDATE() AS DATE)
-		AND c.img is not null
-		;"""
-    checker.execute(checker_sql)
-    res = checker.fetchone()
-    checker.close()
-
-    img = res[22]
-
-    image_folder = "images"
-    image_filename = img if img is not None else ""
-    image_path = os.path.join(image_folder, image_filename)
-    print(image_path)
-
-
-test_send_image()
-
 # Процедура перевірки наявності помилок в БД crm (92 server)
 def create_loan_checker_crm(p_type_id):
     try:
@@ -335,10 +290,10 @@ def check_error_crm(result_data, p_silent_send):
                 11: template11,
             }
 
-            image_folder = "images"
+            #image_folder = "images"
             image_filename = img if img is not None else ""
-            image_path = os.path.join(image_folder, image_filename)
-            print(f"Зображення: {image_path}. Папка: {image_folder}, картинка: {image_filename}. Оригінал img: {img}")
+            #image_path = os.path.join(image_folder, image_filename)
+            #print(f"Зображення: {image_path}. Папка: {image_folder}, картинка: {image_filename}. Оригінал img: {img}")
 
             # Отримуємо шаблон за ключем
             message_template = templates.get(error_type_report, "❌ Невідомий тип помилки")
@@ -354,13 +309,13 @@ def check_error_crm(result_data, p_silent_send):
                 bot.send_message(petrenko_id, message, parse_mode="HTML")
 
             # Відправка фото, якщо файл існує
-            if os.path.isfile(image_path):
-                with open(image_path, "rb") as photo:
-                    bot.send_photo(group_id, photo, caption=message, parse_mode="HTML",
+            if os.path.isfile(image_filename):
+                with open(image_filename, "rb") as photo:
+                    bot.send_photo(nykodiuk_id, photo, caption=message, parse_mode="HTML",
                                    disable_notification=bool(p_silent_send))
             else:
-                print(f"❌ Файл {image_path} не знайдено! Відправляємо лише текст.")
-                bot.send_message(group_id, message, parse_mode="HTML",
+                print(f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст.")
+                bot.send_message(nykodiuk_id, message, parse_mode="HTML",
                                  disable_notification=bool(p_silent_send))
 
             # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
