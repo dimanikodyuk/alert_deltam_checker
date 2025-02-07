@@ -311,11 +311,11 @@ def check_error_crm(result_data, p_silent_send):
             # Відправка фото, якщо файл існує
             if os.path.isfile(image_filename):
                 with open(image_filename, "rb") as photo:
-                    bot.send_photo(nykodiuk_id, photo, caption=message, parse_mode="HTML",
+                    bot.send_photo(group_id, photo, caption=message, parse_mode="HTML",
                                    disable_notification=bool(p_silent_send))
             else:
                 print(f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст.")
-                bot.send_message(nykodiuk_id, message, parse_mode="HTML",
+                bot.send_message(group_id, message, parse_mode="HTML",
                                  disable_notification=bool(p_silent_send))
 
             # Оновлення статусу відправки помилки по ліду з таблиці crm..finx_error_leads_bot
