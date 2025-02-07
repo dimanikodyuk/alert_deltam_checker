@@ -293,6 +293,7 @@ def check_error_crm(result_data, p_silent_send):
             image_folder = "images"
             image_filename = img if img is not None else ""
             image_path = os.path.join(image_folder, image_filename)
+            print(f"Зображення: {image_path}. Папка: {image_folder}, картинка: {image_filename}. Оригінал img: {img}")
 
             # Отримуємо шаблон за ключем
             message_template = templates.get(error_type_report, "❌ Невідомий тип помилки")
