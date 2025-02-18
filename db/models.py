@@ -1,6 +1,7 @@
 import pymysql
 import pymssql
 import telebot
+import subprocess
 import os
 from config import (host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm,
                     passowrd_dlm, database_dlm, group_id, nykodiuk_id, rovnyi_id, petrenko_id, harchenko_id)
@@ -44,6 +45,13 @@ template11 = """❗❗❗<b>Помилка</b>❗❗❗
 🟪 <b>Опис:</b> <i>{par2}</i>
 
 🟥 <b>К-ть:</b> <i>{par3}</i> 
+    """
+
+template12 = """❗❗❗<b>Помилка</b>❗❗❗
+
+🟪 <b>Сервіс:</b> <i>{error_type}</i>
+
+🟨 <b>Помилка:</b> <i>{error_text}</i>
     """
 
 
@@ -221,6 +229,51 @@ def update_error_send_status(p_lead_id, p_error_id):
     upd_sql = f"EXEC crm..alert_deltam_update {p_lead_id}, {p_error_id}"
     upd.execute(upd_sql)
     upd.close()
+
+
+def ping_gms_host(host: str) -> str:
+    """
+    Виконує команду ping для вказаного хоста і повертає результат.
+
+    :param host: Доменне ім'я або IP-адреса хоста
+    :return: Результат виконання команди ping
+    """
+    try:
+        result = subprocess.run(
+            ["ping", "-n", "4", host],
+            capture_output=True,
+            text=True,
+            encoding="cp866",  # Вказуємо Windows-кодування
+            check=True
+        )
+
+        output = result.stdout
+
+        # Перевіряємо наявність відповіді у виводі
+        if "Ответ" in output or "Reply" in output:
+            return 1 #"✅ Хост доступний"
+        else:
+            return 1 #"❌ Хост недоступний"
+    except subprocess.CalledProcessError:
+        return 2  #"❌ Помилка виконання ping"
+
+
+def send_gms_error(p_silent_send):
+    host_name = "proxy.hyber.im"
+    check_gms_ping = ping_gms_host(host_name)
+    if check_gms_ping != 0:
+        if check_gms_ping == 1:
+            msg_error = f"Хост {host_name} - не відповідає"
+        else:
+            msg_error = f"Помилка виконання ping по хосту {host_name}"
+        logger_deltam_checker.error(msg_error)
+        message = template12.format(error_type="Перевірка GMS", error_text=msg_error)
+
+        if p_silent_send == 1:
+            bot.send_message(nykodiuk_id, message, parse_mode="HTML", disable_notification=True)
+        else:
+            bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+
 
 
 # Процедура перевірки наявності помилок в БД crm (92 server)

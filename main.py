@@ -1,6 +1,6 @@
 from logs.logger import logger_deltam_checker
 from db.models import get_active_config, get_checker_time, create_loan_checker_leads_api, check_error_leads_api, \
-    create_loan_checker_crm, check_error_crm, send_global_error
+    create_loan_checker_crm, check_error_crm, send_global_error, send_gms_error
 from datetime import datetime
 from config import telegram_bot, nykodiuk_id
 import requests
@@ -37,6 +37,9 @@ if __name__ == "__main__":
                     result = create_loan_checker_crm(j[0])
                     for i in result:
                         check_error_crm(i, silent_send)
+                elif int(j[1]) == 3:
+                    send_gms_error(silent_send)
+
         print("--------------------------------------------------------")
 
 
