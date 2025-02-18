@@ -270,9 +270,9 @@ def send_gms_error(p_silent_send):
         message = template12.format(error_type="Перевірка GMS", error_text=msg_error)
 
         if p_silent_send == 1:
-            bot.send_message(nykodiuk_id, message, parse_mode="HTML", disable_notification=True)
+            bot.send_message(group_id, message, parse_mode="HTML", disable_notification=True)
         else:
-            bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+            bot.send_message(group_id, message, parse_mode="HTML")
 
 
 
