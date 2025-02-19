@@ -367,7 +367,9 @@ def check_error_crm(result_data, p_silent_send):
                     bot.send_photo(group_id, photo, caption=message, parse_mode="HTML",
                                    disable_notification=bool(p_silent_send))
             else:
-                print(f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст.")
+                err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
+                print(err_msg)
+                logger_deltam_checker.warning(err_msg)
                 bot.send_message(group_id, message, parse_mode="HTML",
                                  disable_notification=bool(p_silent_send))
 
