@@ -419,7 +419,8 @@ def check_error_crm(result_data, p_silent_send):
             recipients = {
                 5: [rovnyi_id, petrenko_id, harchenko_id],
                 7: [rovnyi_id, petrenko_id, harchenko_id],
-                8: [rovnyi_id, petrenko_id]
+                8: [rovnyi_id, petrenko_id],
+                10: [rovnyi_id, nykodiuk_id]
             }.get(error_type_report, [])
 
             for recipient in recipients:
