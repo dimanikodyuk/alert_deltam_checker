@@ -335,7 +335,7 @@ def create_loan_checker_crm(p_type_id):
             if res:
                 return res
             else:
-                logger_deltam_checker.warning(f"Процедура не повернула результат для id = {p_type_id}")
+                #logger_deltam_checker.warning(f"Процедура не повернула результат для id = {p_type_id}")
                 return None
 
         conn_mssql.commit()  # Зберігаємо транзакцію після виконання
