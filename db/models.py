@@ -1,6 +1,7 @@
 import pymysql
 import pymssql
 import telebot
+import platform
 import subprocess
 import os
 from config import (host_delta, user_delta, password_delta, database_delta, telegram_bot, host_dlm, user_dlm,
@@ -263,30 +264,39 @@ def ping_gms_host(host: str) -> str:
     :return: Результат виконання команди ping
     """
     try:
-        # Виконуємо ping з 1 спробою і таймаутом 3 секунди
-        result = subprocess.run(
-            ["ping", "-n", "4", "-w", "3000", host],  # -w в мілісекундах для Windows
-            capture_output=True,
-            text=True,
-            encoding="cp866",  # Для правильного відображення тексту в Windows
-            check=False  # Не викликати виняток при помилці
-        )
+        # Перевірка операційної системи і вибір параметрів для ping
+        system_type = platform.system().lower()
+
+        if system_type == 'windows':
+            # Для Windows використовуємо -n і -w
+            result = subprocess.run(
+                ["ping", "-n", "4", "-w", "3000", host],  # -w в мілісекундах для Windows
+                capture_output=True,
+                text=True,
+                encoding="cp866",  # Для правильного відображення тексту в Windows
+                check=False  # Не викликати виняток при помилці
+            )
+        else:
+            # Для Linux використовуємо -c і -W
+            result = subprocess.run(
+                ["ping", "-c", "4", "-W", "3", host],  # -W в секундах для Linux
+                capture_output=True,
+                text=True,
+                check=False  # Не викликати виняток при помилці
+            )
 
         output = result.stdout
         print(f"""---------------------------------------------
-PING GMS: """)
+    PING GMS: {output}""")
 
-        #logger_deltam_checker.info(f"Вивід команди PING GMS: {output}")
-
-        # Перевіряємо, чи є відповідь від хоста
-        if "Ответ" in output or "Reply" in output:
+        # Перевіряємо наявність відповіді в результаті ping
+        if "bytes from" in output:
             return 0  # Успішний пінг
         else:
             return 1  # Хост не відповідає
     except Exception as e:
         logger_deltam_checker.error(f"Помилка виконання ping: {e}")
         return 2  # Випадок, якщо команда взагалі не запускається
-
 
 def send_gms_error(p_silent_send):
     host_name = "proxy.hyber.im"
@@ -301,15 +311,13 @@ def send_gms_error(p_silent_send):
         logger_deltam_checker.error(msg_error)
         message = template12.format(error_type="Перевірка GMS", error_text=msg_error)
 
-        # Відправлення повідомлення
+            # Відправлення повідомлення
         bot.send_message(
             group_id,
             message,
             parse_mode="HTML",
             disable_notification=bool(p_silent_send)
         )
-
-#send_gms_error(0)
 
 # Процедура перевірки наявності помилок в БД crm (92 server)
 def create_loan_checker_crm(p_type_id):
