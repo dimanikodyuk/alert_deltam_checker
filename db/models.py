@@ -270,7 +270,7 @@ def ping_gms_host(host: str) -> str:
         if system_type == 'windows':
             # Для Windows використовуємо -n і -w
             result = subprocess.run(
-                ["ping", "-n", "4", "-w", "3000", host],  # -w в мілісекундах для Windows
+                ["ping", "-n", "4", "-w", "10000", host],  # -w в мілісекундах для Windows
                 capture_output=True,
                 text=True,
                 encoding="cp866",  # Для правильного відображення тексту в Windows
@@ -279,7 +279,7 @@ def ping_gms_host(host: str) -> str:
         else:
             # Для Linux використовуємо -c і -W
             result = subprocess.run(
-                ["ping", "-c", "4", "-W", "3", host],  # -W в секундах для Linux
+                ["ping", "-c", "4", "-W", "10", host],  # -W в секундах для Linux
                 capture_output=True,
                 text=True,
                 check=False  # Не викликати виняток при помилці
@@ -298,6 +298,7 @@ def ping_gms_host(host: str) -> str:
         logger_deltam_checker.error(f"Помилка виконання ping: {e}")
         return 2  # Випадок, якщо команда взагалі не запускається
 
+
 def send_gms_error(p_silent_send):
     host_name = "proxy.hyber.im"
     check_gms_ping = ping_gms_host(host_name)
@@ -313,11 +314,12 @@ def send_gms_error(p_silent_send):
 
             # Відправлення повідомлення
         bot.send_message(
-            group_id,
+            nykodiuk_id,
             message,
             parse_mode="HTML",
             disable_notification=bool(p_silent_send)
         )
+
 
 # Процедура перевірки наявності помилок в БД crm (92 server)
 def create_loan_checker_crm(p_type_id):
@@ -383,6 +385,26 @@ def check_error_leads_api(result_data, p_silent_send):
         logger_deltam_checker.error(f"Помилка в check_error_leads_api: {err}")
         send_global_error(err)
 
+
+# Функція запису sql запиту в файл і його відправка
+def send_sql_file(p_bot, chat_id, sql_query, message_text):
+    # Зберігаємо SQL-запит у файл
+    file_path = "sql_query.sql"
+    with open(file_path, "w", encoding="utf-8") as file:
+        file.write(sql_query)
+
+    # Відправляємо повідомлення з файлом
+    with open(file_path, "rb") as file:
+        p_bot.send_document(
+            chat_id,
+            file,
+            caption=message_text,  # Повідомлення разом із файлом
+            parse_mode="HTML"
+        )
+
+    # Видаляємо файл після відправлення (не обов'язково)
+    os.remove(file_path)
+
 # Генерація тексту помилки і відправка з 92 серверу
 def check_error_crm(result_data, p_silent_send):
     print(result_data)
@@ -426,23 +448,51 @@ def check_error_crm(result_data, p_silent_send):
             for recipient in recipients:
                 bot.send_message(recipient, message, parse_mode="HTML")
 
-            # Відправка фото, якщо файл існує
-            if img:
-                image_filename = img
-                if os.path.isfile(image_filename):
-                    with open(image_filename, "rb") as photo:
-                        bot.send_photo(
-                            group_id, photo, caption=message, parse_mode="HTML",
-                            disable_notification=bool(p_silent_send)
-                        )
-                else:
-                    err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
-                    logger_deltam_checker.warning(err_msg)
-                    bot.send_message(group_id, message, parse_mode="HTML",
-                                     disable_notification=bool(p_silent_send))
+            #print(f"PAR1: {par1}, PAR2: {par2}")
+            # Якщо використовується template10 — відправляємо SQL-файл
+            if message_template == template10 and par1 == "file_send":
+                sql_query = par2
+                #print(f"SQL_QUERY: {sql_query}")
+                #print(f"Відправляємо файл: ")
+                send_sql_file(bot, nykodiuk_id, sql_query, message)
+
             else:
-                bot.send_message(group_id, message, parse_mode="HTML",
-                                 disable_notification=bool(p_silent_send))
+
+                # Відправка фото, якщо файл існує
+                if img:
+                    image_filename = img
+                    if os.path.isfile(image_filename):
+                        with open(image_filename, "rb") as photo:
+                            bot.send_photo(
+                                nykodiuk_id, photo, caption=message, parse_mode="HTML",
+                                disable_notification=bool(p_silent_send)
+                            )
+                    else:
+                        err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
+                        logger_deltam_checker.warning(err_msg)
+                        bot.send_message(nykodiuk_id, message, parse_mode="HTML",
+                                         disable_notification=bool(p_silent_send))
+                else:
+                    bot.send_message(nykodiuk_id, message, parse_mode="HTML",
+                                     disable_notification=bool(p_silent_send))
+
+            # Відправка фото, якщо файл існує
+            # if img:
+            #     image_filename = img
+            #     if os.path.isfile(image_filename):
+            #         with open(image_filename, "rb") as photo:
+            #             bot.send_photo(
+            #                 group_id, photo, caption=message, parse_mode="HTML",
+            #                 disable_notification=bool(p_silent_send)
+            #             )
+            #     else:
+            #         err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
+            #         logger_deltam_checker.warning(err_msg)
+            #         bot.send_message(group_id, message, parse_mode="HTML",
+            #                          disable_notification=bool(p_silent_send))
+            # else:
+            #     bot.send_message(group_id, message, parse_mode="HTML",
+            #                      disable_notification=bool(p_silent_send))
 
             # Оновлення статусу відправки
             update_error_send_status(error_lead, error_id)
