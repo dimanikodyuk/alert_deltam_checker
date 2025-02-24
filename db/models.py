@@ -314,7 +314,7 @@ def send_gms_error(p_silent_send):
 
             # Відправлення повідомлення
         bot.send_message(
-            nykodiuk_id,
+            group_id,
             message,
             parse_mode="HTML",
             disable_notification=bool(p_silent_send)
@@ -454,7 +454,7 @@ def check_error_crm(result_data, p_silent_send):
                 sql_query = par2
                 #print(f"SQL_QUERY: {sql_query}")
                 #print(f"Відправляємо файл: ")
-                send_sql_file(bot, nykodiuk_id, sql_query, message)
+                send_sql_file(bot, group_id, sql_query, message)
 
             else:
 
@@ -464,16 +464,16 @@ def check_error_crm(result_data, p_silent_send):
                     if os.path.isfile(image_filename):
                         with open(image_filename, "rb") as photo:
                             bot.send_photo(
-                                nykodiuk_id, photo, caption=message, parse_mode="HTML",
+                                group_id, photo, caption=message, parse_mode="HTML",
                                 disable_notification=bool(p_silent_send)
                             )
                     else:
                         err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
                         logger_deltam_checker.warning(err_msg)
-                        bot.send_message(nykodiuk_id, message, parse_mode="HTML",
+                        bot.send_message(group_id, message, parse_mode="HTML",
                                          disable_notification=bool(p_silent_send))
                 else:
-                    bot.send_message(nykodiuk_id, message, parse_mode="HTML",
+                    bot.send_message(group_id, message, parse_mode="HTML",
                                      disable_notification=bool(p_silent_send))
 
             # Відправка фото, якщо файл існує
