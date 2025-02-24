@@ -35,8 +35,9 @@ if __name__ == "__main__":
                 # Якщо БД crm (92)
                 elif int(j[1]) == 2:
                     result = create_loan_checker_crm(j[0])
-                    for i in result:
-                        check_error_crm(i, silent_send)
+                    if result is not None:
+                        for i in result:
+                            check_error_crm(i, silent_send)
                 elif int(j[1]) == 3:
                     send_gms_error(silent_send)
 
