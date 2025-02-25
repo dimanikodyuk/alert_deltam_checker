@@ -439,6 +439,7 @@ def check_error_crm(result_data, p_silent_send):
 
             # Відправка повідомлення конкретним користувачам
             recipients = {
+                4: [rovnyi_id, nykodiuk_id],
                 5: [rovnyi_id, petrenko_id, harchenko_id],
                 7: [rovnyi_id, petrenko_id, harchenko_id],
                 8: [rovnyi_id, petrenko_id],
