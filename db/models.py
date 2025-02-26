@@ -493,6 +493,7 @@ def check_error_crm(result_data, p_silent_send):
                         else:
                             err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
                             logger_deltam_checker.warning(err_msg)
+                            send_global_error(err_msg)
                             bot.send_message(chat_id, message, parse_mode="HTML",
                                              disable_notification=bool(p_silent_send))
                     else:
