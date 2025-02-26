@@ -496,7 +496,7 @@ def check_error_crm(result_data, p_silent_send):
                             bot.send_message(chat_id, message, parse_mode="HTML",
                                              disable_notification=bool(p_silent_send))
                     else:
-                        logger_deltam_checker.warning(f"Фото {image_filename}")
+                        #logger_deltam_checker.warning(f"Фото {image_filename}")
                         bot.send_message(chat_id, message, parse_mode="HTML",
                                          disable_notification=bool(p_silent_send))
 
