@@ -202,6 +202,24 @@ def get_checker_time(p_type_id):
         return None
 
 
+def get_chat_id(p_type_id):
+    try:
+        with conn_mssql.cursor() as checker:
+            checker_sql = "select chat_id from crm..alert_deltam_config where id = %s;"
+            checker.execute(checker_sql, (p_type_id,))  # Параметризований запит
+            res = checker.fetchall()
+            if res:
+                chat_ids = res[0][0]  # '538001061,502287136,310797108'
+                chat_id_list = chat_ids.split(',')
+
+                return chat_id_list
+            else:
+                logger_deltam_checker.warning(f"GET_CHAT_ID -> Немає запису з id = {p_type_id}")
+                return None
+    except Exception as e:
+        logger_deltam_checker.error(f"GET_CHAT_ID -> Помилка отримання даних: {e}")
+        return None
+
 # Функція перевірки на повторність запису по підпису документа за день
 def check_repeat_type(p_repeat_type):
     res = ''
@@ -405,6 +423,8 @@ def send_sql_file(p_bot, chat_id, sql_query, message_text):
     # Видаляємо файл після відправлення (не обов'язково)
     os.remove(file_path)
 
+
+
 # Генерація тексту помилки і відправка з 92 серверу
 def check_error_crm(result_data, p_silent_send):
     print(result_data)
@@ -416,7 +436,7 @@ def check_error_crm(result_data, p_silent_send):
 
         if result_data[0] == 1:
             (
-                error_type, error_text, error_lead, error_contract_num, error_type_report, _,
+                error_type, error_text, error_lead, error_contract_num, error_type_report, error_check_type,
                 error_id, error_inn, error_dt, error_repeat, repeat_id, error_data,
                 par1, par2, par3, par4, par5, client_id, dial_flow_id, work_item_id,
                 test_procedure, img
@@ -438,44 +458,49 @@ def check_error_crm(result_data, p_silent_send):
             message = message_template.format(**locals())
 
             # Відправка повідомлення конкретним користувачам
-            recipients = {
-                4: [rovnyi_id, nykodiuk_id],
-                5: [rovnyi_id, petrenko_id, harchenko_id],
-                7: [rovnyi_id, petrenko_id, harchenko_id],
-                8: [rovnyi_id, petrenko_id],
-                10: [rovnyi_id, nykodiuk_id]
-            }.get(error_type_report, [])
+            # recipients = {
+            #     4: [rovnyi_id, nykodiuk_id],
+            #     5: [rovnyi_id, petrenko_id, harchenko_id],
+            #     7: [rovnyi_id, petrenko_id, harchenko_id],
+            #     8: [rovnyi_id, petrenko_id],
+            #     10: [rovnyi_id, nykodiuk_id]
+            # }.get(error_type_report, [])
+            #
+            # for recipient in recipients:
+            #     bot.send_message(recipient, message, parse_mode="HTML")
 
-            for recipient in recipients:
-                bot.send_message(recipient, message, parse_mode="HTML")
+            v_chat_id = get_chat_id(error_check_type)
+            for chat_id in v_chat_id:
+                print(chat_id)
 
-            #print(f"PAR1: {par1}, PAR2: {par2}")
-            # Якщо використовується template10 — відправляємо SQL-файл
-            if message_template == template10 and par1 == "file_send":
-                sql_query = par2
-                #print(f"SQL_QUERY: {sql_query}")
-                #print(f"Відправляємо файл: ")
-                send_sql_file(bot, group_id, sql_query, message)
+                if message_template == template10 and par1 == "file_send":
+                    sql_query = par2
+                    # print(f"SQL_QUERY: {sql_query}")
+                    # print(f"Відправляємо файл: ")
+                    send_sql_file(bot, chat_id, sql_query, message)
 
-            else:
-
-                # Відправка фото, якщо файл існує
-                if img:
-                    image_filename = img
-                    if os.path.isfile(image_filename):
-                        with open(image_filename, "rb") as photo:
-                            bot.send_photo(
-                                group_id, photo, caption=message, parse_mode="HTML",
-                                disable_notification=bool(p_silent_send)
-                            )
-                    else:
-                        err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
-                        logger_deltam_checker.warning(err_msg)
-                        bot.send_message(group_id, message, parse_mode="HTML",
-                                         disable_notification=bool(p_silent_send))
                 else:
-                    bot.send_message(group_id, message, parse_mode="HTML",
-                                     disable_notification=bool(p_silent_send))
+
+                    # Відправка фото, якщо файл існує
+                    if img:
+                        image_filename = img
+                        if os.path.isfile(image_filename):
+                            with open(image_filename, "rb") as photo:
+                                bot.send_photo(
+                                    chat_id, photo, caption=message, parse_mode="HTML",
+                                    disable_notification=bool(p_silent_send)
+                                )
+                        else:
+                            err_msg = f"❌ Файл {image_filename} не знайдено! Відправляємо лише текст."
+                            logger_deltam_checker.warning(err_msg)
+                            bot.send_message(chat_id, message, parse_mode="HTML",
+                                             disable_notification=bool(p_silent_send))
+                    else:
+                        logger_deltam_checker.warning(f"Фото {image_filename}")
+                        bot.send_message(chat_id, message, parse_mode="HTML",
+                                         disable_notification=bool(p_silent_send))
+
+                update_error_send_status(error_lead, error_id)
 
             # Відправка фото, якщо файл існує
             # if img:
@@ -496,7 +521,7 @@ def check_error_crm(result_data, p_silent_send):
             #                      disable_notification=bool(p_silent_send))
 
             # Оновлення статусу відправки
-            update_error_send_status(error_lead, error_id)
+
 
     except IndexError as err:
         logger_deltam_checker.error(f"IndexError у check_error_crm: {err}")
