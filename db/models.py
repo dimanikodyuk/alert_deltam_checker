@@ -474,12 +474,12 @@ def check_error_crm(result_data, p_silent_send):
                 print(chat_id)
 
                 # Отримуємо абсолютний шлях до папки, де знаходиться main.py
-                BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+                #BASE_DIR = os.path.dirname(os.path.abspath(__file__))
                 # Якщо шлях відносний – робимо його абсолютним
-                if not os.path.isabs(img):
-                    img_path = os.path.join(BASE_DIR, img)
-                else:
-                    img_path = img  # Якщо шлях вже абсолютний, використовуємо його
+                #if not os.path.isabs(img):
+                #    img_path = os.path.join(BASE_DIR, img)
+                #else:
+                #    img_path = img  # Якщо шлях вже абсолютний, використовуємо його
 
                 if message_template == template10 and par1 == "file_send":
                     sql_query = par2
@@ -491,7 +491,7 @@ def check_error_crm(result_data, p_silent_send):
 
                     # Відправка фото, якщо файл існує
                     if img:
-                        image_filename = img_path
+                        image_filename = img
                         if os.path.isfile(image_filename):
                             with open(image_filename, "rb") as photo:
                                 bot.send_photo(
