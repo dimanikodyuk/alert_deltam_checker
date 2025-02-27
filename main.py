@@ -39,7 +39,8 @@ if __name__ == "__main__":
                         for i in result:
                             check_error_crm(i, silent_send)
                 elif int(j[1]) == 3:
-                    send_gms_error(silent_send)
+                    print("GMS")
+                    #send_gms_error(silent_send)
 
         print("--------------------------------------------------------")
 
