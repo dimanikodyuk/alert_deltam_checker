@@ -492,8 +492,8 @@ def check_error_crm(result_data, p_silent_send):
                     # Формуємо шлях до зображення
                     image_filename = os.path.join(script_dir, img)
 
-                    print(f"img: {img}")  # Дізнаємось, що саме містить змінна
-                    print(f"image_filename: {image_filename}")  # Дізнаємось, який шлях формується
+                    logger_deltam_checker.info(f"img: {img}")  # Дізнаємось, що саме містить змінна
+                    logger_deltam_checker.info(f"image_filename: {image_filename}")  # Дізнаємось, який шлях формується
 
                     if img:
                         #image_filename = img
