@@ -159,15 +159,6 @@ template9 = """❗❗❗<b>Помилка</b>❗❗❗
 
 
 def get_active_config():
-    #id_conf = []
-    #conf = conn_mssql.cursor()
-    #conf_sql = "SELECT id, db_id FROM crm..alert_deltam_config;"
-    #conf.execute(conf_sql)
-    #res = conf.fetchall()
-    #conf.close()
-    #for i in res:
-    #    id_conf.append(i)
-    #return id_conf
     try:
         with conn_mssql.cursor() as conf:
             conf.execute("SELECT id, db_id FROM crm..alert_deltam_config;")
@@ -257,9 +248,15 @@ def create_loan_checker_leads_api(p_type_id):
         logger_deltam_checker.error("Помилка create_loan_checker_leads_api: " + str(err))
         send_global_error(err)
 
+
 def send_global_error(p_error_text):
-    url = f"https://api.telegram.org/bot{telegram_bot}/sendMessage?chat_id={nykodiuk_id}&text={p_error_text}"
-    requests.get(url)
+    #url = f"https://api.telegram.org/bot{telegram_bot}/sendMessage?chat_id={nykodiuk_id}&text={p_error_text}"
+    #requests.get(url)
+    message = f"""❗❗❗<b>Глобальна помилка БОТУ</b>❗❗❗
+    
+🟥 <b>Текст:</b> <i>{p_error_text}</i> 
+"""
+    bot.send_message(nykodiuk_id, message, parse_mode="HTML")
 
 
 def update_error_send_status(p_lead_id, p_error_id):
@@ -489,9 +486,16 @@ def check_error_crm(result_data, p_silent_send):
 
                 else:
 
+                    # Отримуємо абсолютний шлях до директорії скрипта
+                    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+                    # Формуємо шлях до зображення
+                    image_filename = os.path.join(script_dir, "images", img)
+
+                    if os.path.isfile(image_filename):
                     # Відправка фото, якщо файл існує
-                    if img:
-                        image_filename = img
+                    #if img:
+                        #image_filename = img
                         if os.path.isfile(image_filename):
                             with open(image_filename, "rb") as photo:
                                 bot.send_photo(
