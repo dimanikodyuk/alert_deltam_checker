@@ -492,12 +492,10 @@ def check_error_crm(result_data, p_silent_send):
                     # Формуємо шлях до зображення
                     image_filename = os.path.join(script_dir, img)
 
+                    print(f"img: {img}")  # Дізнаємось, що саме містить змінна
+                    print(f"image_filename: {image_filename}")  # Дізнаємось, який шлях формується
 
-                    if os.path.isfile(image_filename):
-                        print(f"img: {img}")  # Дізнаємось, що саме містить змінна
-                        print(f"image_filename: {image_filename}")  # Дізнаємось, який шлях формується
-                    # Відправка фото, якщо файл існує
-                    #if img:
+                    if img:
                         #image_filename = img
                         if os.path.isfile(image_filename):
                             with open(image_filename, "rb") as photo:
