@@ -249,12 +249,20 @@ def create_loan_checker_leads_api(p_type_id):
         send_global_error(err)
 
 
+# Функція екранізації спецсимволів
+def escape_md(text: str) -> str:
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    for ch in escape_chars:
+        text = text.replace(ch, "\\" + ch)
+    return text
+
+
 def send_global_error(p_error_text):
     #url = f"https://api.telegram.org/bot{telegram_bot}/sendMessage?chat_id={nykodiuk_id}&text={p_error_text}"
     #requests.get(url)
     message = f"""❗❗❗<b>Глобальна помилка БОТУ</b>❗❗❗
     
-🟥 <b>Текст:</b> <i>{p_error_text}</i> 
+🟥 <b>Текст:</b> <i>{escape_md(str(p_error_text))}</i> 
 """
     bot.send_message(nykodiuk_id, message, parse_mode="HTML")
 
