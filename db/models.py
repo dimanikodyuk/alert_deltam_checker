@@ -258,13 +258,18 @@ def escape_md(text: str) -> str:
 
 
 def send_global_error(p_error_text):
+
     #url = f"https://api.telegram.org/bot{telegram_bot}/sendMessage?chat_id={nykodiuk_id}&text={p_error_text}"
     #requests.get(url)
-    message = f"""❗❗❗<b>Глобальна помилка БОТУ</b>❗❗❗
-    
-🟥 <b>Текст:</b> <i>{escape_md(str(p_error_text))}</i> 
-"""
-    bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+
+#
+#     message = f"""❗❗❗<b>Глобальна помилка БОТУ</b>❗❗❗
+#
+# 🟥 <b>Текст:</b> <i>{escape_md(str(p_error_text))}</i>
+# """
+#     bot.send_message(nykodiuk_id, message, parse_mode="HTML")
+
+    bot.send_message(nykodiuk_id, f"Глобальна помилка:\n{p_error_text}", parse_mode=None)
 
 
 def update_error_send_status(p_lead_id, p_error_id):
