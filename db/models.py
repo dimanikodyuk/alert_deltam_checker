@@ -161,7 +161,7 @@ template9 = """❗❗❗<b>Помилка</b>❗❗❗
 def get_active_config():
     try:
         with conn_mssql.cursor() as conf:
-            conf.execute("SELECT id, db_id FROM crm..alert_deltam_config;")
+            conf.execute("SELECT id, db_id FROM crm..alert_deltam_config WHERE is_active = 1;")
             return conf.fetchall()  # fetchall() вже повертає список кортежів
     except Exception as e:
         print(f"Помилка під час виконання SQL-запиту: {e}")
